@@ -243,7 +243,7 @@ class ChatView extends React.Component {
       <SettingsContext.Consumer>
         {(settings) => (
           <ChatViewWrapper
-            style={{ 
+            style={{
               gridTemplateRows: `auto ${this.state.composerSize}px`,
               background: settings['chatViewBgImg'],
               backgroundSize: 'cover'
