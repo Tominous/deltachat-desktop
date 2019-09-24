@@ -8,7 +8,7 @@ import { callDcMethodAsync } from '../../ipc'
 import ScreenContext from '../../contexts/ScreenContext'
 import { useContacts, ContactList2, PseudoContactListItem } from '../helpers/ContactList'
 import { DeltaButtonPrimary } from '../helpers/SmallDialog'
-import { DeltaDialogBase, DeltaDialogCloseButton, GoBackDialogHeader } from '../helpers/DeltaDialog'
+import { DeltaDialogBase, DeltaDialogHeader, DeltaDialogBody, DeltaDialogFooter } from '../helpers/DeltaDialog'
 import {
   CreateChatSearchInput,
   CreateChatContactListWrapper,
@@ -98,16 +98,15 @@ export default function CreateChat (props) {
     <DeltaDialogBase
       isOpen={isOpen}
       onClose={onClose}
-      style={{ width: '400px', height: '76vh', top: '12vh' }}
+      style={{ width: '400px', height: 'calc(100% - 60px)' }}
       fixed
     >
       { viewMode.startsWith('main') &&
           (<>
-            <div className='bp3-dialog-header'>
+            <DeltaDialogHeader onClose={onClose}>
               <CreateChatSearchInput onChange={onSearchChange} value={queryStr} placeholder={tx('contacts_enter_name_or_email')} autoFocus />
-              <DeltaDialogCloseButton onClick={onClose} />
-            </div>
-            <div className={Classes.DIALOG_BODY}>
+            </DeltaDialogHeader>
+            <DeltaDialogBody noFooter>
               <Card>
                 <CreateChatContactListWrapper>
                   { renderAddGroupIfNeeded()}
@@ -115,8 +114,7 @@ export default function CreateChat (props) {
                   {renderAddContactIfNeeded()}
                 </CreateChatContactListWrapper>
               </Card>
-            </div>
-            <div className={Classes.DIALOG_FOOTER} />
+            </DeltaDialogBody>
           </>)
       }
       { viewMode.startsWith('createGroup') && <CreateGroupInner {...{ viewMode, setViewMode, onClose }} />}
@@ -172,7 +170,7 @@ export function useGroupMembers () {
 export const GroupSettingsSetNameAndProfileImage = ({ groupImage, onSetGroupImage, onUnsetGroupImage, groupName, setGroupName }) => {
   const tx = window.translate
   return (
-    <GroupSettingsContainer>
+    <GroupSettingsContainer style={{ paddingBottom: '20px' }}>
       <GroupImage
         style={{ float: 'left' }}
         groupImage={groupImage}
@@ -194,14 +192,14 @@ export const AddMemberInnerDialog = ({ onClickBack, onClose, onSearchChange, que
 
   return (
     <>
-      <GoBackDialogHeader
+      <DeltaDialogHeader
         title={tx('group_add_members')}
         onClickBack={onClickBack}
         onClose={onClose}
       />
-      <div className={Classes.DIALOG_BODY}>
-        <Card style={{ paddingTop: '0px' }}>
-          <GroupMemberSearchInput onChange={onSearchChange} value={queryStr} placeholder={tx('search')} autoFocus />
+      <DeltaDialogBody noFooter>
+        <Card style={{ padding: '0px 20px' }}>
+          <GroupMemberSearchInput style={{ marginLeft: '20px' }} onChange={onSearchChange} value={queryStr} placeholder={tx('search')} autoFocus />
           <GroupMemberContactListWrapper>
             <ContactList2
               contacts={searchContacts}
@@ -213,8 +211,7 @@ export const AddMemberInnerDialog = ({ onClickBack, onClose, onSearchChange, que
             { queryStr !== '' && searchContacts.length === 0 && PseudoContactListItemNoSearchResults({ queryStr })}
           </GroupMemberContactListWrapper>
         </Card>
-      </div>
-      <div className={Classes.DIALOG_FOOTER} />
+      </DeltaDialogBody>
     </>
   )
 }
@@ -224,7 +221,7 @@ export const ShowQrCodeInnerDialog = ({ onClickBack, onClose, qrCode }) => {
 
   return (
     <>
-      <GoBackDialogHeader
+      <DeltaDialogHeader
         title={tx('qrshow_title')}
         onClickBack={onClickBack}
         onClose={onClose}
@@ -330,7 +327,7 @@ export function CreateGroupInner (props) {
       })}
       { viewMode.startsWith('createGroup-main') &&
         <>
-          <GoBackDialogHeader
+          <DeltaDialogHeader
             title={tx('menu_new_group')}
             onClickBack={() => setViewMode('main')}
             onClose={closeAndDelete}
@@ -365,7 +362,7 @@ export function CreateGroupInner (props) {
               </GroupMemberContactListWrapper>
             </Card>
           </div>
-          <div className={Classes.DIALOG_FOOTER}>
+          <DeltaDialogFooter>
             <div className={Classes.DIALOG_FOOTER_ACTIONS}>
               <DeltaButtonPrimary
                 noPadding
@@ -374,7 +371,7 @@ export function CreateGroupInner (props) {
                 {tx('group_create_button')}
               </DeltaButtonPrimary>
             </div>
-          </div>
+          </DeltaDialogFooter>
         </>
       }
     </>
@@ -431,53 +428,53 @@ export function CreateVerifiedGroupInner (props) {
         qrCode: qrCode
       })}
       { viewMode.startsWith('createVerifiedGroup-main') &&
-        <>
-          <GoBackDialogHeader
-            title={tx('menu_new_verified_group')}
-            onClickBack={() => setViewMode('main')}
-            onClose={closeAndDelete}
-          />
-          <div className={Classes.DIALOG_BODY}>
-            <Card>
-              {GroupSettingsSetNameAndProfileImage({ groupImage, onSetGroupImage, onUnsetGroupImage, groupName, setGroupName })}
-              <GroupSeperator>{tx('n_members', groupMembers.length, groupMembers.length <= 1 ? 'one' : 'other')}</GroupSeperator>
-              <GroupMemberContactListWrapper>
-                <GroupMemberSearchInput onChange={onSearchChange} value={queryStr} placeholder={tx('search')} />
-                {renderAddMemberIfNeeded()}
+      <>
+        <DeltaDialogHeader
+          title={tx('menu_new_verified_group')}
+          onClickBack={() => setViewMode('main')}
+          onClose={closeAndDelete}
+        />
+        <div className={Classes.DIALOG_BODY}>
+          <Card>
+            {GroupSettingsSetNameAndProfileImage({ groupImage, onSetGroupImage, onUnsetGroupImage, groupName, setGroupName })}
+            <GroupSeperator>{tx('n_members', groupMembers.length, groupMembers.length <= 1 ? 'one' : 'other')}</GroupSeperator>
+            <GroupMemberContactListWrapper>
+              <GroupMemberSearchInput onChange={onSearchChange} value={queryStr} placeholder={tx('search')} />
+              {renderAddMemberIfNeeded()}
+              <ContactList2
+                contacts={searchContacts.filter(({ id }) => groupMembers.indexOf(id) !== -1)}
+                onClick={() => {}}
+                showCheckbox
+                isChecked={() => true}
+                onCheckboxClick={removeGroupMember}
+              />
+              {queryStr !== '' && searchContactsToAdd.length !== 0 && (
+              <>
+                <GroupSeperator noMargin>{tx('group_add_members')}</GroupSeperator>
                 <ContactList2
-                  contacts={searchContacts.filter(({ id }) => groupMembers.indexOf(id) !== -1)}
+                  contacts={searchContactsToAdd}
                   onClick={() => {}}
                   showCheckbox
-                  isChecked={() => true}
-                  onCheckboxClick={removeGroupMember}
+                  isChecked={() => false}
+                  onCheckboxClick={addGroupMember}
                 />
-                {queryStr !== '' && searchContactsToAdd.length !== 0 && (
-                <>
-                  <GroupSeperator noMargin>{tx('group_add_members')}</GroupSeperator>
-                  <ContactList2
-                    contacts={searchContactsToAdd}
-                    onClick={() => {}}
-                    showCheckbox
-                    isChecked={() => false}
-                    onCheckboxClick={addGroupMember}
-                  />
-                </>
-                )}
-                {queryStr !== '' && searchContacts.length === 0 && PseudoContactListItemNoSearchResults({ queryStr })}
-              </GroupMemberContactListWrapper>
-            </Card>
+              </>
+              )}
+              {queryStr !== '' && searchContacts.length === 0 && PseudoContactListItemNoSearchResults({ queryStr })}
+            </GroupMemberContactListWrapper>
+          </Card>
+        </div>
+        <div className={Classes.DIALOG_FOOTER}>
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <DeltaButtonPrimary
+              noPadding
+              onClick={finishCreateGroup}
+            >
+              {tx('group_create_button')}
+            </DeltaButtonPrimary>
           </div>
-          <div className={Classes.DIALOG_FOOTER}>
-            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-              <DeltaButtonPrimary
-                noPadding
-                onClick={finishCreateGroup}
-              >
-                {tx('group_create_button')}
-              </DeltaButtonPrimary>
-            </div>
-          </div>
-        </>
+        </div>
+      </>
       }
     </>
   )

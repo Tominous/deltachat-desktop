@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import SearchableList from '../SearchableList'
 import { RenderContact } from '../Contact'
-import { callDcMethodAsync } from '../../ipc'
+import { callDcMethod } from '../../ipc'
 import Contact, { PseudoContact } from './Contact'
+import debounce from 'debounce'
 
 const ContactListDiv = styled.div`
   .module-contact-list-item--with-click-handler {
@@ -14,16 +15,17 @@ const ContactListDiv = styled.div`
   }
 `
 
+const debouncedGetContacts2 = debounce((listFlags, queryStr, cb) => {
+  callDcMethod('getContacts2', [listFlags, queryStr], cb)
+}, 200)
+
 export function useContacts (listFlags, queryStr) {
   const [contacts, setContacts] = useState([])
 
-  const updateContacts = async (queryStr) => {
-    const contacts = await callDcMethodAsync('getContacts2', [listFlags, queryStr])
-    setContacts(contacts)
-  }
+  const updateContacts = queryStr => debouncedGetContacts2(listFlags, queryStr, setContacts)
 
   useEffect(() => {
-    updateContacts(queryStr)
+    callDcMethod('getContacts2', [listFlags, queryStr], setContacts)
   }, [])
 
   return [contacts, updateContacts]
@@ -81,16 +83,6 @@ const ContactListItemWrapper = styled.div`
   }
 `
 
-const ContactListItemInitial = styled.div`
-  min-width: 40px;
-  max-width: 40px;
-  height: 64px;
-  text-align: center;
-  font-size: 26px;
-  padding-top: 23px;
-  text-transform: capitalize;
-  color: var(--contactListInitalColor);
-`
 const ContactListItemInitialSpacer = styled.div`
   min-width: 40px;
   max-width: 40px;
@@ -102,7 +94,7 @@ const ContactListItemContactWrapper = styled.div`
 
 const ContactListItemCheckboxWrapper = styled.div`
   width: 40px;
-  margin-right: 20px;
+  margin-right: 40px;
   input {
     -webkit-appearance: none;
     width: 20px;
@@ -183,22 +175,26 @@ const DeltaCheckbox = (props) => {
   )
 }
 export function ContactListItem (props) {
-  const { contact, showInitial, onClick, showCheckbox, checked, onCheckboxClick } = props
+  const { contact, onClick, showCheckbox, checked } = props
+  const onCheckboxClick = e => {
+    if (!showCheckbox) return
+    e && e.stopPropagation()
+    typeof props.onCheckboxClick === 'function' && props.onCheckboxClick(contact)
+  }
   return (
     <ContactListItemWrapper
       key={contact.id}
-      onClick={() => onClick(contact)}
+      onClick={() => {
+        onClick(contact)
+        onCheckboxClick()
+      }}
     >
-      {showInitial && <ContactListItemInitial>{contact.displayName[0]}</ContactListItemInitial> }
-      {!showInitial && <ContactListItemInitialSpacer /> }
+      <ContactListItemInitialSpacer />
       <ContactListItemContactWrapper>
         <Contact contact={contact} />
       </ContactListItemContactWrapper>
       {showCheckbox &&
-        <DeltaCheckbox checked={checked} disabled={contact.id === 1} onClick={e => {
-          e.stopPropagation()
-          typeof onCheckboxClick === 'function' && onCheckboxClick(contact)
-        }} />
+        <DeltaCheckbox checked={checked} disabled={contact.id === 1} onClick={onCheckboxClick} />
       }
     </ContactListItemWrapper>
   )
@@ -209,7 +205,6 @@ export function PseudoContactListItem (props) {
   return (
     <ContactListItemWrapper
       key={id}
-      showInitial={false}
       onClick={onClick}
     >
       <ContactListItemInitialSpacer />
@@ -222,20 +217,12 @@ export function PseudoContactListItem (props) {
 
 export function ContactList2 (props) {
   const { contacts, onClick, showCheckbox, isChecked, onCheckboxClick } = props
-  let currInitial = ''
   return contacts.map(contact => {
-    const initial = contact.displayName[0].toLowerCase()
-    let showInitial = false
-    if (initial !== currInitial) {
-      currInitial = initial
-      showInitial = true
-    }
-
     let checked = null
     if (showCheckbox && typeof isChecked === 'function') {
       checked = isChecked(contact)
     }
-    return ContactListItem({ contact, onClick, showInitial, showCheckbox, checked, onCheckboxClick })
+    return ContactListItem({ contact, onClick, showCheckbox, checked, onCheckboxClick })
   })
 }
 

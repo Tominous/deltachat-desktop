@@ -47,3 +47,7 @@ export function openBlockContactDialog (screenContext, selectedChat) {
 export function openEncryptionInfoDialog (screenContext, chat) {
   screenContext.openDialog('EncryptionInfo', { chat })
 }
+
+export function openEditGroupDialog (screenContext, selectedChat) {
+  screenContext.openDialog('EditGroup', { chat: selectedChat })
+}

@@ -1,15 +1,12 @@
 import React, { Fragment, useState } from 'react'
-import styled, { createGlobalStyle } from 'styled-components'
-import { Dialog } from '@blueprintjs/core'
+import styled, { createGlobalStyle, css } from 'styled-components'
+import { Dialog, Classes } from '@blueprintjs/core'
 import classNames from 'classnames'
 
 export const CreateDeltaDialogGlobal = createGlobalStyle`
   .FixedDeltaDialog {
     position: absolute;
     top: 0;
-  }
-  .bp3-dialog-header {
-    padding-right: 4px;
   }
 `
 
@@ -29,11 +26,7 @@ export const DeltaDialogBase = React.memo((props) => {
   )
 })
 
-export const DeltaDialogCloseButtonWrapper = styled.div`
-  .bp3-icon-cross::before {
-    font-size: x-large !important;
-  }
-
+export const DeltaDialogButtonMixin = css`
   .bp3-icon-large {
     margin-right: 0px;
   }
@@ -42,11 +35,34 @@ export const DeltaDialogCloseButtonWrapper = styled.div`
   }
 `
 
+export const DeltaDialogCloseButtonWrapper = styled.div`
+  ${DeltaDialogButtonMixin}
+  .bp3-icon-cross::before {
+    margin-right: -14px;
+    font-size: 24px;
+  }
+`
+
 export function DeltaDialogCloseButton (props) {
   return (
     <DeltaDialogCloseButtonWrapper>
       <button {...props} aria-label='Close' className='bp3-dialog-close-button bp3-button bp3-minimal bp3-icon-large bp3-icon-cross' />
     </DeltaDialogCloseButtonWrapper>
+  )
+}
+export const DeltaDialogBackButtonWrapper = styled.div`
+  ${DeltaDialogButtonMixin}
+  button::before {
+    margin-left: -13px !important;
+    font-size: 20px !important;
+  }
+`
+
+export function DeltaDialogBackButton (props) {
+  return (
+    <DeltaDialogBackButtonWrapper>
+      <button {...props} className='bp3-button bp3-minimal bp3-icon-large bp3-icon-arrow-left' />
+    </DeltaDialogBackButtonWrapper>
   )
 }
 
@@ -61,6 +77,7 @@ const DeltaDialog = React.memo((props) => {
     </DeltaDialogBase>
   )
 })
+
 export default DeltaDialog
 
 export const useDialog = (DialogComponent) => {
@@ -82,12 +99,35 @@ export const useDialog = (DialogComponent) => {
   return [renderDialog, showDialog]
 }
 
-export function GoBackDialogHeader ({ onClickBack, title, onClose }) {
+export function DeltaDialogHeader (props) {
+  let { onClickBack, title, onClose, children, showBackButton } = props
+  if (typeof showBackButton === 'undefined') showBackButton = typeof onClickBack === 'function'
   return (
-    <div className='bp3-dialog-header'>
-      <button onClick={onClickBack} className='bp3-button bp3-minimal bp3-icon-large bp3-icon-arrow-left' />
-      <h4 className='bp3-heading'>{title}</h4>
+    <div className={classNames(Classes.DIALOG_HEADER, 'bp3-dialog-header-border-bottom')}>
+      { showBackButton && <DeltaDialogBackButton onClick={onClickBack} /> }
+      { title && <h4 className='bp3-heading'>{title}</h4> }
+      { children }
       <DeltaDialogCloseButton onClick={onClose} />
+    </div>
+  )
+}
+
+export function DeltaDialogFooter (props) {
+  let { hide, children } = props
+  if (typeof hide === 'undefined') hide = typeof children === 'undefined'
+  return (
+    <div style={{ display: hide ? 'none' : 'unset' }} className={classNames(Classes.DIALOG_FOOTER, 'bp3-dialog-footer-border-top')}>
+      {children}
+    </div>
+  )
+}
+
+export function DeltaDialogBody (props) {
+  let { noFooter, children } = props
+  noFooter = noFooter !== false
+  return (
+    <div className={classNames(Classes.DIALOG_BODY, { '.bp3-dialog-body-no-footer': noFooter })} >
+      {children}
     </div>
   )
 }

@@ -1,10 +1,13 @@
 $bp3-dialog-radius: 2px;
 
 .bp3-dialog {
+  position: absolute !important;
+  max-height: calc(100vh - 60px);
+  margin: 30px 0px;
+  padding: 0px;
   background: var(--bp3DialogBgSecondary);
   border-radius: $bp3-dialog-radius;
-  margin-bottom: 0px;
-  padding-bottom: 0px;
+  box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 4px 8px rgba(16, 22, 26, 0.2), 0 0 20px 3px rgba(16, 22, 26, 0.2);
 }
 
 .bp3-dialog-body {
@@ -19,10 +22,20 @@ $bp3-dialog-radius: 2px;
   padding: 20px;
 }
 
+.bp3-dialog-body-no-footer {
+  border-radius: $bp3-dialog-radius;
+}
+
+.bp3-dialog-footer-border-top {
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #ececec;
+}
+
 .bp3-dialog-footer {
   background-color: var(--bp3DialogBgPrimary);
   margin: 0;
-  padding: 0 20px 20px;
+  padding: 15px;
   border-radius: $bp3-dialog-radius;
 }
 
@@ -58,7 +71,9 @@ $bp3-dialog-radius: 2px;
 .bp3-heading {
   color: var(--bp3Heading);
 }
-
+.bp3-button[class*="bp3-icon-"]::before {
+    color: var(--scrollbarThumb);
+}
 .bp3-button:not([class*="bp3-intent-"], :icon) {
   color: var(--bp3ButtonText);
   background-color: var(--bp3ButtonBg);
@@ -83,6 +98,13 @@ $bp3-dialog-radius: 2px;
   background-color: var(--bp3DialogHeaderBg);
   // We should have one variable for dialog/context menu border radius
   border-radius: 2px 2px 0 0;
+  padding: 20px;
+}
+
+.bp3-dialog-header-border-bottom {
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #ececec;
 }
 
 .bp3-input {
@@ -172,6 +194,6 @@ $bp3-dialog-radius: 2px;
 }
 
 .bp3-overlay-backdrop { 
-  background-color: rgba(12, 12, 12, 0.05);
+  background-color: rgba(12, 12, 12, 0.1);
 }
 

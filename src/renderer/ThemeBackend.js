@@ -51,7 +51,7 @@ export function ThemeDataBuilder (theme) {
   let themeData = {
     // Misc
     colorPrimary: '#53948c',
-    colorDanger: '#f44336',
+    colorDanger: '#f96856',
     colorNone: '#8ca5a1',
     ovalButtonBg: theme.ovalButtonBg,
     ovalButtonBgHover: undefinedGuard(
@@ -136,7 +136,7 @@ export function ThemeDataBuilder (theme) {
     contextMenuSelectedBg: '#a4a6a9',
     // Bp3 overwrites
     bp3DialogHeaderBg: theme.bgPrimary,
-    bp3DialogHeaderIcon: '#5c7080',
+    bp3DialogHeaderIcon: '#666666',
     bp3DialogBgSecondary: theme.bgSecondary,
     bp3DialogBgPrimary: theme.bgPrimary,
     bp3Heading: theme.textPrimary,

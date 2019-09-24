@@ -38,6 +38,9 @@ const ConversationWrapper = styled.div`
     max-height: 100%;
     width:100%;
     padding: 0 0.5em;
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
   }
 
   ul {

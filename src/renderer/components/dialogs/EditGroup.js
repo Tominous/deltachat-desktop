@@ -3,7 +3,7 @@ import { callDcMethodAsync } from '../../ipc'
 import C from 'deltachat-node/constants'
 import differ from 'array-differ'
 import { Card, Classes } from '@blueprintjs/core'
-import { DeltaDialogBase, GoBackDialogHeader } from '../helpers/DeltaDialog'
+import { DeltaDialogBase, DeltaDialogHeader, DeltaDialogFooter } from '../helpers/DeltaDialog'
 import { DeltaButtonPrimary } from '../helpers/SmallDialog'
 import { useGroupImage, useContactSearch, GroupSettingsSetNameAndProfileImage, AddMemberInnerDialog, ShowQrCodeInnerDialog } from './CreateChat'
 import { useContacts, ContactList2 } from '../helpers/ContactList'
@@ -111,9 +111,10 @@ export function EditGroupInner (props) {
       })}
       { viewMode === 'main' &&
       <>
-        <GoBackDialogHeader
+        <DeltaDialogHeader
           title={tx('menu_edit_group')}
           onClose={onClose}
+          borderBottom
         />
         <div className={Classes.DIALOG_BODY}>
           <Card>
@@ -145,7 +146,7 @@ export function EditGroupInner (props) {
             </GroupMemberContactListWrapper>
           </Card>
         </div>
-        <div className={Classes.DIALOG_FOOTER}>
+        <DeltaDialogFooter>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <DeltaButtonPrimary
               noPadding
@@ -154,7 +155,7 @@ export function EditGroupInner (props) {
               {tx('save_desktop')}
             </DeltaButtonPrimary>
           </div>
-        </div>
+        </DeltaDialogFooter>
         </>
       }
     </>
